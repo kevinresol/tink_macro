@@ -14,13 +14,13 @@ abstract Member(Field) from Field to Field {
     return ret;
   }
     
-  static public function getter(field:String, ?pos, e:Expr, ?t:ComplexType) 
-    return method('get_' + field, pos, false, e.func(t));
+  static public function getter(field:String, ?pos, e:Expr, ?t:ComplexType, ?isStatic = false) 
+    return method('get_' + field, pos, false, e.func(t), isStatic);
   
-  static public function setter(field:String, ?param = 'param', ?pos, e:Expr, ?t:ComplexType) 
-    return method('set_' + field, pos, false, [e, param.resolve(pos)].toBlock(pos).func([param.toArg(t)], t));
+  static public function setter(field:String, ?param = 'param', ?pos, e:Expr, ?t:ComplexType, ?isStatic = false) 
+    return method('set_' + field, pos, false, [e, param.resolve(pos)].toBlock(pos).func([param.toArg(t)], t), isStatic);
   
-  static public function method(name:String, ?pos, ?isPublic = true, f:Function) {
+  static public function method(name:String, ?pos, ?isPublic = true, f:Function, ?isStatic = false) {
     var f:Field = {
       name: name,
       pos: if (pos == null) f.expr.pos else pos,
@@ -28,6 +28,7 @@ abstract Member(Field) from Field to Field {
     };
     var ret:Member = f;
     ret.isPublic = isPublic;
+    ret.isStatic = isStatic;
     return ret;
   }
   
