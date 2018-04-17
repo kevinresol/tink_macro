@@ -143,21 +143,24 @@ class Types {
     };
   }
   
+  static public function asFloat(t:Type, ?pos:Position) {
+    return switch t {
+      case TInst(_.get() => {kind: KExpr(macro $v{(i:Float)})}, _): Std.parseFloat(i);
+      case _: pos.sanitize().error('Expected type parameter to be a float literal');
+    }
+  }
+  
   static public function asInt(t:Type, ?pos:Position) {
     return switch t {
       case TInst(_.get() => {kind: KExpr(macro $v{(i:Int)})}, _): Std.parseInt(i);
-      case _: 
-        if(pos == null) pos = Context.currentPos();
-        pos.error('Expected type parameter to be a integer literal');
+      case _: pos.sanitize().error('Expected type parameter to be a integer literal');
     }
   }
   
   static public function asString(t:Type, ?pos:Position) {
     return switch t {
       case TInst(_.get() => {kind: KExpr(macro $v{(s:String)})}, _): s;
-      case _: 
-        if(pos == null) pos = Context.currentPos();
-        pos.error('Expected type parameter to be a string literal');
+      case _: pos.sanitize().error('Expected type parameter to be a string literal');
     }
   }
   
@@ -165,18 +168,7 @@ class Types {
   static public function asRegExp(t:Type, ?pos:Position) {
     return switch t {
       case TInst(_.get() => {kind: KExpr({expr: EConst(CRegexp(r, opt))})}, _): {r: r, opt: opt};
-      case _: 
-        if(pos == null) pos = Context.currentPos();
-        pos.error('Expected type parameter to be a regular expression literal');
-    }
-  }
-  
-  static public function asFloat(t:Type, ?pos:Position) {
-    return switch t {
-      case TInst(_.get() => {kind: KExpr(macro $v{(i:Float)})}, _): Std.parseFloat(i);
-      case _: 
-        if(pos == null) pos = Context.currentPos();
-        pos.error('Expected type parameter to be a float literal');
+      case _: pos.sanitize().error('Expected type parameter to be a regular expression literal');
     }
   }
   
@@ -184,9 +176,7 @@ class Types {
   static public function asBool(t:Type, ?pos:Position) {
     return switch t {
       case TInst(_.get() => {kind: KExpr({expr: EConst(CIdent(b = 'true' | 'false'))})}, _): b == 'true';
-      case _: 
-        if(pos == null) pos = Context.currentPos();
-        pos.error('Expected type parameter to be a Bool literal');
+      case _: pos.sanitize().error('Expected type parameter to be a Bool literal');
     }
   }
 
