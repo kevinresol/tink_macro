@@ -142,6 +142,53 @@ class Types {
       sub: sub
     };
   }
+  
+  static public function asInt(t:Type, ?pos:Position) {
+    return switch t {
+      case TInst(_.get() => {kind: KExpr(macro $v{(i:Int)})}, _): Std.parseInt(i);
+      case _: 
+        if(pos == null) pos = Context.currentPos();
+        pos.error('Expected type parameter to be a integer literal');
+    }
+  }
+  
+  static public function asString(t:Type, ?pos:Position) {
+    return switch t {
+      case TInst(_.get() => {kind: KExpr(macro $v{(s:String)})}, _): s;
+      case _: 
+        if(pos == null) pos = Context.currentPos();
+        pos.error('Expected type parameter to be a string literal');
+    }
+  }
+  
+  // if we return a EReg instance then one can't break it down to r & opt again
+  static public function asRegExp(t:Type, ?pos:Position) {
+    return switch t {
+      case TInst(_.get() => {kind: KExpr({expr: EConst(CRegexp(r, opt))})}, _): {r: r, opt: opt};
+      case _: 
+        if(pos == null) pos = Context.currentPos();
+        pos.error('Expected type parameter to be a regular expression literal');
+    }
+  }
+  
+  static public function asFloat(t:Type, ?pos:Position) {
+    return switch t {
+      case TInst(_.get() => {kind: KExpr(macro $v{(i:Float)})}, _): Std.parseFloat(i);
+      case _: 
+        if(pos == null) pos = Context.currentPos();
+        pos.error('Expected type parameter to be a float literal');
+    }
+  }
+  
+  // atm this is useless because you can't write `MyType<true>`, which is a syntax error
+  static public function asBool(t:Type, ?pos:Position) {
+    return switch t {
+      case TInst(_.get() => {kind: KExpr({expr: EConst(CIdent(b = 'true' | 'false'))})}, _): b == 'true';
+      case _: 
+        if(pos == null) pos = Context.currentPos();
+        pos.error('Expected type parameter to be a Bool literal');
+    }
+  }
 
   static public inline function asComplexType(s:String, ?params)
     return TPath(asTypePath(s, params));
